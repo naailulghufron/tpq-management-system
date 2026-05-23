@@ -50,7 +50,7 @@ The Filament panel is available at:
 /admin
 ```
 
-Only users with the `super_admin` role can access it.
+Only users with the `Super Admin` role can access it.
 
 ## Structure
 

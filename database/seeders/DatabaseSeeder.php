@@ -17,15 +17,20 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $roles = [
-            'super_admin',
-            'admin',
-            'ustadz',
-            'staff',
+            'Super Admin',
+            'Kepala TPQ',
+            'Bendahara',
+            'Guru',
+            'Wali Santri',
+            'Admin Website',
+            'Auditor',
         ];
 
         foreach ($roles as $role) {
             Role::findOrCreate($role);
         }
+
+        $this->call(PermissionSeeder::class);
 
         $admin = User::query()->firstOrCreate(
             ['email' => env('ADMIN_EMAIL', 'admin@tpq.test')],
@@ -35,6 +40,6 @@ class DatabaseSeeder extends Seeder
             ],
         );
 
-        $admin->assignRole('super_admin');
+        $admin->assignRole('Super Admin');
     }
 }

@@ -1,0 +1,96 @@
+<?php
+
+namespace App\Filament\Resources\StudentAttendances;
+
+use App\Filament\Resources\StudentAttendances\Pages\CreateStudentAttendance;
+use App\Filament\Resources\StudentAttendances\Pages\EditStudentAttendance;
+use App\Filament\Resources\StudentAttendances\Pages\ListStudentAttendances;
+use App\Filament\Resources\StudentAttendances\Pages\ViewStudentAttendance;
+use App\Filament\Support\ResourceDefaults;
+use App\Models\StudentAttendance;
+use BackedEnum;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Actions\ViewAction;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+
+class StudentAttendanceResource extends Resource
+{
+    protected static ?string $model = StudentAttendance::class;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    public static function getNavigationGroup(): string|\UnitEnum|null
+    {
+        return ResourceDefaults::group(static::$model);
+    }
+
+    public static function getRecordTitleAttribute(): ?string
+    {
+        return ResourceDefaults::titleAttribute(static::$model);
+    }
+
+    public static function form(Schema $schema): Schema
+    {
+        return $schema
+            ->components(ResourceDefaults::formComponents(static::$model));
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema
+            ->components(ResourceDefaults::infolistComponents(static::$model));
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns(ResourceDefaults::tableColumns(static::$model))
+            ->filters([
+                TrashedFilter::make(),
+            ])
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+            ])
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    RestoreBulkAction::make(),
+                ]),
+            ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            //
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => ListStudentAttendances::route('/'),
+            'create' => CreateStudentAttendance::route('/create'),
+            'view' => ViewStudentAttendance::route('/{record}'),
+            'edit' => EditStudentAttendance::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getRecordRouteBindingEloquentQuery(): Builder
+    {
+        return parent::getRecordRouteBindingEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
+    }
+}

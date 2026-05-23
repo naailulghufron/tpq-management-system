@@ -23,7 +23,7 @@ Keep Filament resources thin. Put business rules in domain actions/services, per
 
 ## Security Baseline
 
-- Filament admin access is restricted to users with the `super_admin` role.
+- Filament admin access is restricted to users with the `Super Admin` role.
 - Initial roles are seeded from `DatabaseSeeder`.
 - Activity logging is enabled and the `User` model logs name and email changes only.
 - MariaDB credentials and initial admin credentials are environment-driven.
