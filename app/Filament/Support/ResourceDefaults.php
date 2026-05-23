@@ -44,6 +44,33 @@ use Filament\Tables\Columns\TextColumn;
 
 class ResourceDefaults
 {
+    /**
+     * Generate default StudentSavingsTransaction number:
+     * TPQ-AH\SV\YYYYMMDD{SEQ}
+     */
+    private static function generateStudentSavingsTransactionNumber(): string
+    {
+        $datePart = now()->format('Ymd');
+        $prefix = "TPQ-AH\\SV\\{$datePart}";
+
+        $last = \App\Models\StudentSavingsTransaction::query()
+            ->where('transaction_number', 'like', "{$prefix}%")
+            ->orderByDesc('id')
+            ->first();
+
+        $seq = 1;
+        if ($last) {
+            $transactionNumber = (string) $last->transaction_number;
+            if (preg_match('/' . preg_quote($prefix, '/') . '([0-9]+)$/', $transactionNumber, $m)) {
+                $seq = (int) $m[1] + 1;
+            } else {
+                $seq = 1;
+            }
+        }
+
+        return $prefix . str_pad((string) $seq, 4, '0', STR_PAD_LEFT);
+    }
+
     public static function group(string $model): string
     {
         return match ($model) {
@@ -270,9 +297,14 @@ class ResourceDefaults
             ],
             StudentSavingsTransaction::class => [
                 self::rel('student_savings_account_id', 'studentSavingsAccount', 'account_number')->required(),
-                self::text('transaction_number', true)->unique(ignoreRecord: true),
+
+                // Default transaction number format: TPQ-AH\SV\YYYYMMDD{SEQ}
+                self::text('transaction_number', true)->unique(ignoreRecord: true)
+                    ->default(fn (): string => static::generateStudentSavingsTransactionNumber()),
+
                 self::select('type', ['deposit' => 'Deposit', 'withdrawal' => 'Withdrawal', 'adjustment' => 'Adjustment'])->required(),
-                DatePicker::make('transaction_date')->required(),
+                DatePicker::make('transaction_date')->required()->default(fn () => now()->toDateString()),
+
                 self::money('amount')->required(),
                 self::money('balance_after')->disabled()->dehydrated(false),
                 self::transactionStatus(),
