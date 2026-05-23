@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,21 +15,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $roles = [
-            'Super Admin',
-            'Kepala TPQ',
-            'Bendahara',
-            'Guru',
-            'Wali Santri',
-            'Admin Website',
-            'Auditor',
-        ];
-
-        foreach ($roles as $role) {
-            Role::findOrCreate($role);
-        }
-
-        $this->call(PermissionSeeder::class);
+        $this->call(RolePermissionSeeder::class);
 
         $admin = User::query()->firstOrCreate(
             ['email' => env('ADMIN_EMAIL', 'admin@tpq.test')],

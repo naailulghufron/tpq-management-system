@@ -35,55 +35,74 @@ class OverviewStatsWidget extends StatsOverviewWidget
 
     protected function getStats(): array
     {
-        return [
-            Stat::make('Total santri aktif', $this->number($this->count(Student::class, ['status' => 'active'])))
+        $stats = [];
+        $user = auth()->user();
+
+        if ($user?->can('students.view')) {
+            $stats[] = Stat::make('Total santri aktif', $this->number($this->count(Student::class, ['status' => 'active'])))
                 ->description('Santri terdaftar aktif')
                 ->descriptionColor('success')
                 ->color('success')
-                ->icon(Heroicon::OutlinedUserGroup),
+                ->icon(Heroicon::OutlinedUserGroup);
+        }
 
-            Stat::make('Total guru', $this->number($this->count(Teacher::class, ['status' => 'active'])))
+        if ($user?->can('teachers.view')) {
+            $stats[] = Stat::make('Total guru', $this->number($this->count(Teacher::class, ['status' => 'active'])))
                 ->description('Pengajar aktif')
                 ->descriptionColor('success')
                 ->color('success')
-                ->icon(Heroicon::OutlinedAcademicCap),
+                ->icon(Heroicon::OutlinedAcademicCap);
+        }
 
-            Stat::make('Total program aktif', $this->number($this->count(Program::class, ['status' => 'active'])))
+        if ($user?->can('programs.view')) {
+            $stats[] = Stat::make('Total program aktif', $this->number($this->count(Program::class, ['status' => 'active'])))
                 ->description('Program pendidikan berjalan')
                 ->descriptionColor('warning')
                 ->color('warning')
-                ->icon(Heroicon::OutlinedBookOpen),
+                ->icon(Heroicon::OutlinedBookOpen);
+        }
 
-            Stat::make('Absensi hari ini', $this->attendanceToday())
+        if ($user?->can('attendance.view')) {
+            $stats[] = Stat::make('Absensi hari ini', $this->attendanceToday())
                 ->description('Hadir / total presensi santri')
                 ->descriptionColor('success')
                 ->color('success')
-                ->icon(Heroicon::OutlinedClipboardDocumentCheck),
+                ->icon(Heroicon::OutlinedClipboardDocumentCheck);
+        }
 
-            Stat::make('Saldo kas', $this->rupiah($this->cashBalance()))
+        if ($user?->can('finance.view')) {
+            $stats[] = Stat::make('Saldo kas', $this->rupiah($this->cashBalance()))
                 ->description('Kas awal + transaksi posted')
                 ->descriptionColor('warning')
                 ->color('warning')
-                ->icon(Heroicon::OutlinedBanknotes),
+                ->icon(Heroicon::OutlinedBanknotes);
+        }
 
-            Stat::make('Saldo tabungan santri', $this->rupiah($this->savingsBalance()))
+        if ($user?->can('savings.view')) {
+            $stats[] = Stat::make('Saldo tabungan santri', $this->rupiah($this->savingsBalance()))
                 ->description('Dihitung dari transaksi posted')
                 ->descriptionColor('success')
                 ->color('success')
-                ->icon(Heroicon::OutlinedWallet),
+                ->icon(Heroicon::OutlinedWallet);
+        }
 
-            Stat::make('Pembayaran bulan ini', $this->rupiah($this->paymentsThisMonth()))
+        if ($user?->can('finance.view')) {
+            $stats[] = Stat::make('Pembayaran bulan ini', $this->rupiah($this->paymentsThisMonth()))
                 ->description(now()->translatedFormat('F Y'))
                 ->descriptionColor('success')
                 ->color('success')
-                ->icon(Heroicon::OutlinedDocumentCurrencyDollar),
+                ->icon(Heroicon::OutlinedDocumentCurrencyDollar);
+        }
 
-            Stat::make('Tunggakan', $this->rupiah($this->arrears()))
+        if ($user?->can('finance.view')) {
+            $stats[] = Stat::make('Tunggakan', $this->rupiah($this->arrears()))
                 ->description('Tagihan belum lunas')
                 ->descriptionColor('danger')
                 ->color('danger')
-                ->icon(Heroicon::OutlinedBellAlert),
-        ];
+                ->icon(Heroicon::OutlinedBellAlert);
+        }
+
+        return $stats;
     }
 
     private function count(string $model, array $where = []): int

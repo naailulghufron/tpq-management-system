@@ -19,7 +19,11 @@ class Dashboard extends BaseDashboard
 
     public function getSubheading(): ?string
     {
-        return 'Ringkasan operasional pendidikan, absensi, keuangan, dan aktivitas terbaru.';
+        $roles = auth()->user()?->roles?->pluck('name')->join(', ');
+
+        return $roles
+            ? "Ringkasan operasional sesuai akses: {$roles}."
+            : 'Ringkasan operasional sesuai permission pengguna.';
     }
 
     public function getColumns(): int|array
@@ -33,11 +37,34 @@ class Dashboard extends BaseDashboard
 
     public function getWidgets(): array
     {
-        return [
+        $widgets = [
             DashboardHeaderWidget::class,
-            OverviewStatsWidget::class,
-            EducationProgressChart::class,
-            RecentActivitiesWidget::class,
         ];
+
+        if ($this->canViewOperationalStats()) {
+            $widgets[] = OverviewStatsWidget::class;
+        }
+
+        if (auth()->user()?->can('programs.view')) {
+            $widgets[] = EducationProgressChart::class;
+        }
+
+        if (auth()->user()?->can('activity_logs.view')) {
+            $widgets[] = RecentActivitiesWidget::class;
+        }
+
+        return $widgets;
+    }
+
+    private function canViewOperationalStats(): bool
+    {
+        return auth()->user()?->canAny([
+            'students.view',
+            'teachers.view',
+            'programs.view',
+            'attendance.view',
+            'finance.view',
+            'savings.view',
+        ]) ?? false;
     }
 }

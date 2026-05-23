@@ -93,4 +93,20 @@ class StudentResource extends Resource
                 SoftDeletingScope::class,
             ]);
     }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+        $user = auth()->user();
+
+        if (! $user) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        if ($user->canAny(['students.create', 'students.update', 'students.delete', 'attendance.create', 'programs.view', 'finance.view'])) {
+            return $query;
+        }
+
+        return $query->whereHas('parents', fn (Builder $query) => $query->where('user_id', $user->id));
+    }
 }

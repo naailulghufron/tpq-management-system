@@ -21,6 +21,11 @@ class EducationProgressChart extends ChartWidget
 
     protected static ?int $sort = 3;
 
+    public static function canView(): bool
+    {
+        return auth()->user()?->can('programs.view') ?? false;
+    }
+
     protected function getType(): string
     {
         return 'doughnut';

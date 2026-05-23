@@ -53,7 +53,7 @@ class ResourceDefaults
         $datePart = now()->format('Ymd');
         $prefix = "TPQ-AH\\SV\\{$datePart}";
 
-        $last = \App\Models\StudentSavingsTransaction::query()
+        $last = StudentSavingsTransaction::query()
             ->where('transaction_number', 'like', "{$prefix}%")
             ->orderByDesc('id')
             ->first();
@@ -61,14 +61,14 @@ class ResourceDefaults
         $seq = 1;
         if ($last) {
             $transactionNumber = (string) $last->transaction_number;
-            if (preg_match('/' . preg_quote($prefix, '/') . '([0-9]+)$/', $transactionNumber, $m)) {
+            if (preg_match('/'.preg_quote($prefix, '/').'([0-9]+)$/', $transactionNumber, $m)) {
                 $seq = (int) $m[1] + 1;
             } else {
                 $seq = 1;
             }
         }
 
-        return $prefix . str_pad((string) $seq, 4, '0', STR_PAD_LEFT);
+        return $prefix.str_pad((string) $seq, 4, '0', STR_PAD_LEFT);
     }
 
     public static function group(string $model): string
@@ -119,6 +119,7 @@ class ResourceDefaults
             ],
             StudentParent::class => [
                 self::rel('student_id', 'student', 'name')->required(),
+                self::rel('user_id', 'user', 'name'),
                 self::text('name', true),
                 self::text('relationship', true),
                 self::text('phone')->tel(),
@@ -368,7 +369,7 @@ class ResourceDefaults
     {
         return match ($model) {
             Student::class => ['student_number', 'name', 'gender', 'status'],
-            StudentParent::class => ['student.name', 'name', 'relationship', 'phone', 'status'],
+            StudentParent::class => ['student.name', 'user.name', 'name', 'relationship', 'phone', 'status'],
             Teacher::class => ['employee_number', 'name', 'phone', 'status'],
             AcademicYear::class => ['name', 'start_date', 'end_date', 'is_active', 'status'],
             ProgramCategory::class, Program::class, ProgramLevel::class, ProgramClass::class => ['name', 'status'],

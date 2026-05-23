@@ -11,18 +11,18 @@
                     Pusat kendali pendidikan Al-Qur'an
                 </h2>
                 <p class="mt-2 max-w-3xl text-sm leading-6 text-gray-600">
-                    Pantau santri, guru, program, absensi, kas, tabungan, dan audit aktivitas dalam satu dashboard yang rapi.
+                    Dashboard ini mengikuti permission user aktif, sehingga metrik dan widget yang muncul sesuai akses kerja masing-masing.
                 </p>
             </div>
 
             <div class="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-end">
                 <div class="rounded-md border border-emerald-100 bg-emerald-50 px-3 py-2">
-                    <p class="text-xs font-medium text-emerald-700">Tema</p>
-                    <p class="text-sm font-semibold text-emerald-950">Emerald</p>
+                    <p class="text-xs font-medium text-emerald-700">Role</p>
+                    <p class="text-sm font-semibold text-emerald-950">{{ $this->roleSummary() }}</p>
                 </div>
                 <div class="rounded-md border border-yellow-200 bg-yellow-50 px-3 py-2">
-                    <p class="text-xs font-medium text-yellow-700">Aksen</p>
-                    <p class="text-sm font-semibold text-yellow-950">Soft gold</p>
+                    <p class="text-xs font-medium text-yellow-700">Akses</p>
+                    <p class="text-sm font-semibold text-yellow-950">{{ $this->accessSummary() }}</p>
                 </div>
             </div>
         </div>
